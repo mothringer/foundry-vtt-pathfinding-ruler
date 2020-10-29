@@ -13,7 +13,7 @@
       "path": "lang/en.json"
     }
   ],
-  "scripts": ["scripts/config.js"]
+  "scripts": ["scripts/config.js"],
   "version": "0.1",
   "minimumCoreVersion": "0.7.5",
   "compatibleCoreVersion": "0.7.5"
