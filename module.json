@@ -3,7 +3,7 @@
   "title": "Grid pathfinder",
   "description": "A module to automate routing of measuring around walls.",
   "url": "https://github.com/mothringer/foundry-vtt-grid-pathfinding",
-  "download": "https://github.com/mothringer/foundry-vtt-grid-pathfinding/archive/master.zip",
+  "download": "https://github.com/mothringer/foundry-vtt-grid-pathfinding/archive/main.zip",
   "manifest": "https://raw.githubusercontent.com/mothringer/foundry-vtt-grid-pathfinding/main/module.json",
   "author": "Mothringer",
   "languages": [
