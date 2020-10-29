@@ -17,4 +17,4 @@ Hooks.once('init', async function ()
 		default: true,
 		type: Boolean,
 	});
-}
+});

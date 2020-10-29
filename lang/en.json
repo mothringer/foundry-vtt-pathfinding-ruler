@@ -1,6 +1,6 @@
 {
-	"grid-pathfinder.pathfinderDiagonals.name",
-	"grid-pathfinder.pathfinderDiagonals.hint",
-	"grid-pathfinder.printMoveToChat.name",
-	"grid-pathfinder.printMoveToChat.hint"
+	"grid-pathfinder.pathfinderDiagonals.name":"Pathfinder measurement",
+	"grid-pathfinder.pathfinderDiagonals.hint": "Every other diagonal costs double distance.",
+	"grid-pathfinder.printMoveToChat.name":"Print distances to chat",
+	"grid-pathfinder.printMoveToChat.hint":"Print distance moved to chat after every move using altered measurement"
 }
