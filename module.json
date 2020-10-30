@@ -1,10 +1,10 @@
 {
-  "name": "grid-pathfinder",
-  "title": "Grid pathfinder",
-  "description": "A module to automate routing of measuring around walls.",
-  "url": "https://github.com/mothringer/foundry-vtt-grid-pathfinding",
-  "download": "https://github.com/mothringer/foundry-vtt-grid-pathfinding/archive/main.zip",
-  "manifest": "https://raw.githubusercontent.com/mothringer/foundry-vtt-grid-pathfinding/main/module.json",
+  "name": "pathfinding-ruler",
+  "title": "Pathfinding Ruler",
+  "description": "A module to automate routing of measurement ruler around walls.",
+  "url": "https://github.com/mothringer/foundry-vtt-pathfinding-ruler",
+  "download": "https://github.com/mothringer/foundry-vtt-pathfinding-ruler/archive/main.zip",
+  "manifest": "https://raw.githubusercontent.com/mothringer/foundry-vtt-pathfinding-ruler/main/module.json",
   "author": "Mothringer [Mothringer#0156]",
   "languages": [
     {
