@@ -1,7 +1,9 @@
 {
-	"grid-pathfinder.pathfinderDiagonals.name":"Pathfinder measurement",
-	"grid-pathfinder.pathfinderDiagonals.hint": "Every other diagonal costs double distance.",
-	"grid-pathfinder.printMoveToChat.name":"Print distances to chat",
-	"grid-pathfinder.printMoveToChat.hint":"Print distance moved to chat after every move using altered measurement",
-	"grid-pathfinder.toolname":"Pathfinding Ruler"
+	"pathfinding-ruler.pathfinderDiagonals.name":"Pathfinder measurement",
+	"pathfinding-ruler.pathfinderDiagonals.hint": "Every other diagonal costs double distance.",
+	"pathfinding-ruler.printMoveToChat.name":"Print distances to chat",
+	"pathfinding-ruler.printMoveToChat.hint":"Print distance moved to chat after every move using altered measurement",
+	"pathfinding-ruler.GMOnly.name":"GM Only",
+	"pathfinding-ruler.GMOnly.hint":"If checked, players will not have access to use the tool",
+	"pathfinding-ruler.toolname":"Pathfinding Ruler"
 }
