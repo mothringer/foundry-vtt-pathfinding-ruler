@@ -68,8 +68,7 @@ class PathfindingRuler
 		this.ruler;
 		this.waypoints;
 		this.grid = [];
-		this.maxSearchDistance = game.settings.get("pathfinding-ruler", "MaxDistance");
-		
+
 		Hooks.on("getSceneControlButtons", (buttons) => {
 			let tokenButton = buttons.find((button) => button.name === "token");
 			if (tokenButton)
@@ -242,7 +241,7 @@ class PathfindingRuler
 				if (openList[i].f < openList[lowIndex].f) {lowIndex = i}
 			}
 			let currentNode = openList[lowIndex];
-			if (currentNode.f > this.maxSearchDistance)
+			if (currentNode.f > game.settings.get("pathfinding-ruler", "MaxDistance"))
 			{
 				this.removeRuler();
 				return;
