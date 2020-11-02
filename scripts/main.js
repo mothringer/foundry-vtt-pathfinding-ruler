@@ -33,7 +33,7 @@ class Config
 			hint: game.i18n.localize("pathfinding-ruler.MaxDistance.hint"),
 			scope: "client",
 			config: true,
-			default: 20,
+			default: 40,
 			type: Number,
 		});
 		/*game.settings.register("pathfinding-ruler", "pathfinderDiagonals",
