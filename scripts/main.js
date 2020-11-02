@@ -27,6 +27,15 @@ class Config
 			default: false,
 			type: Boolean,
 		});
+		game.settings.register("pathfinding-ruler", "MaxDistance",
+		{
+			name: game.i18n.localize("pathfinding-ruler.MaxDistance.name"),
+			hint: game.i18n.localize("pathfinding-ruler.MaxDistance.hint"),
+			scope: "client",
+			config: true,
+			default: 20,
+			type: Number,
+		});
 		/*game.settings.register("pathfinding-ruler", "pathfinderDiagonals",
 		{
 			name: game.i18n.localize("pathfinding-ruler.pathfinderDiagonals.name"),
@@ -58,6 +67,8 @@ class PathfindingRuler
 		this.endpoint = [0,0];
 		this.ruler;
 		this.waypoints;
+		this.grid = [];
+		this.maxSearchDistance = game.settings.get("pathfinding-ruler", "MaxDistance");
 		
 		Hooks.on("getSceneControlButtons", (buttons) => {
 			let tokenButton = buttons.find((button) => button.name === "token");
@@ -115,7 +126,6 @@ class PathfindingRuler
 					}
 					else
 					{
-						this.removeRuler();
 						this.findPath();
 					}
 				}
@@ -155,17 +165,27 @@ class PathfindingRuler
 	convertLocationToGridspace(location)
 	{
 			let gridspace = canvas.grid.getCenter(location.x,location.y);
-			gridspace[0] = (gridspace[0] / canvas.grid.size) + .5;
-			gridspace[1] = (gridspace[1] / canvas.grid.size) + .5;
+			gridspace[0] = (gridspace[0] / canvas.grid.size) - .5;
+			gridspace[1] = (gridspace[1] / canvas.grid.size) - .5;
 			return gridspace;
 	}
 	
 	convertGridspaceToLocation(gridspace)
 	{
-			let location = {x: gridspace[0], y: gridspace[1]};
-			location.x = (location.x - .5 ) * canvas.grid.size;
-			location.y = (location.y - .5 ) * canvas.grid.size;
-			return location;
+		let location = {x:0,y:0};
+		if (Array.isArray(gridspace))
+		{
+			location.x = gridspace[0];
+			location.y = gridspace[1];
+		}
+		else 
+		{
+			location.x = gridspace.x;
+			location.y = gridspace.y;
+		}
+		location.x = (location.x + .5 ) * canvas.grid.size;
+		location.y = (location.y + .5 ) * canvas.grid.size;
+		return location;
 	}
 
 	printDebugToChat(content)
@@ -180,75 +200,147 @@ class PathfindingRuler
 			ChatMessage.create(chatData, {chatBubble : true })
 	}
 	
-	hitsWall(origin, endpoint)
+	hitsWall(A, B)
 	{
-		let ray = new Ray(this.convertGridspaceToLocation(this.origin),this.convertGridspaceToLocation(this.endpoint));
-		return WallsLayer.getRayCollisions(ray,{blockMovement:true, blockSenses:false, mode:"any"});
+		let ray = new Ray(this.convertGridspaceToLocation(A),this.convertGridspaceToLocation(B));
+		if (ray)
+			return WallsLayer.getRayCollisions(ray,{blockMovement:true, blockSenses:false, mode:"any"});
+		else return true;
 	}
 	
-	async findPath()
+	rebuildGrid()
 	{
+		for (let x = 0;x<(canvas.grid._width/canvas.grid.size);x++)
+		{
+			this.grid[x] = [];
+			for (let y = 0;y<(canvas.grid._height/canvas.grid.size);y++)
+			{
+				this.grid[x][y]={};
+				this.grid[x][y].x=x;
+				this.grid[x][y].y=y;
+				this.grid[x][y].f=0;
+				this.grid[x][y].g=0;
+				this.grid[x][y].h=0;
+				this.grid[x][y].parent=null;
+			}
+		}
+	}
+	
+	findPath()
+	{
+		this.rebuildGrid();
+		let endpoint = {x:this.endpoint[0],y:this.endpoint[1]};
 		let openList = [];
 		let closedList = [];
-		openList.push({x:this.origin.x,y:this.origin.y,g:0,h:h(this.origin,this.endpoint),f:h(this.origin,this.endpoint)});
+		openList.push(this.grid[this.origin[0]][this.origin[1]]);
 		
 		while (openList.length > 0)
 		{
 			let lowIndex = 0;
 			for (let i=0; i<openList.length; i++)
 			{
-				if (openList[i].f < openList[lowInd].f) {lowIndex = i}
+				if (openList[i].f < openList[lowIndex].f) {lowIndex = i}
 			}
 			let currentNode = openList[lowIndex];
-			if ({x:currentNode.x,y:currentNode.y} === this.endpoint})
+			if (currentNode.f > this.maxSearchDistance)
+			{
+				this.removeRuler();
+				return;
+			}
+			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
 				let curr = currentNode;
 				let ret = [];
 				while(curr.parent)
 				{
-					ret.push({x:curr.x,y:curr.y});
+					let loc = [curr.x, curr.y];
+					loc = this.convertGridspaceToLocation(loc);
+					let point = new PIXI.Point(loc.x,loc.y);
+					ret.push(point);
 					curr = curr.parent;
 				}
-				this.waypoints = ret;
-				drawRuler();
+				this.waypoints = [];
+				origin = this.convertGridspaceToLocation(this.origin);
+				this.waypoints.push(new PIXI.Point(origin.x,origin.y));
+				for (let i=ret.length-1;i>0;i--)
+					this.waypoints.push(ret[i]);
+				this.drawRuler();
 				return;
 			}
 			openList.splice(lowIndex,1);
 			closedList.push(currentNode);
 			
-			let neighbors = [];
-			
-			for (let i=-1; i<2; i++)
-			{
-				for (let j=-1;j<2;j++)
-				{
-					if (!(i===0 && j===0)
-						neighbors.push({x:(currentNode.x+i),y:(currentNode.y+j),f:,g:,h:});
-				}
-			}
-			
+			let neighbors = this.getNeighbors(currentNode);
 			for(let i=0;i<neighbors.length;i++)
 			{
 				let neighbor = neighbors[i];
+				if (this.isInList(closedList,neighbor) || this.hitsWall(currentNode,neighbor))
+					continue;
 				
+				let gScore = 0;
+				if (currentNode.x === neighbor.x || currentNode.y === neighbor.y)
+					gScore = currentNode.g + 1;
+				else gScore = currentNode.g + 1.5;
+				let gScoreIsBest = false;
+				
+				if (!this.isInList(openList,neighbor))
+				{
+					gScoreIsBest = true;
+					neighbor.h = this.heuristic(neighbor,endpoint)
+					openList.push(neighbor);
+				}
+				else if (gScore < neighbor.g)
+				{
+					gScoreIsBest = true;
+				}
+				if (gScoreIsBest)
+				{
+					neighbor.parent = currentNode;
+					neighbor.g = gScore;
+					neighbor.f = neighbor.g + neighbor.h;
+				}
 			}
-			
 		}
-		this.drawRuler();
+		this.removeRuler();
+	}
+	
+	isInList(list, node)
+	{
+		for (let i=0; i<list.length; i++)
+		{
+			if (list[i].x === node.x && list[i].y === node.y)
+				return true;
+		}
+		return false;
 	}
 	
 	isValidNode(node)
 	{
-		
-		return true;
+		return (node.y >= 0 && node.y < (canvas.grid._height/canvas.grid.size) && node.x >= 0 && node.x < (canvas.grid._width/canvas.grid.size));
 	}
-
-	h(start,end)
+	
+	getNeighbors(node)
+	{
+		let neighbors = [];
+		let x = node.x;
+		let y = node.y;
+		for (let i=-1; i<2; i++)
+		{
+			for (let j=-1;j<2;j++)
+			{
+				if (!(i===0 && j===0)&&this.isValidNode({x:x+i,y:y+j}))
+					neighbors.push(this.grid[x+i][y+j]);
+			}
+		}
+		return neighbors;
+	}
+	
+	heuristic(start,end)
 	{
 		let xdistance = Math.abs(start.x-end.x);
-		let ydistance = Math.abs(start.x-end.x);
+		let ydistance = Math.abs(start.y-end.y);
 		if (xdistance>ydistance) return (xdistance+(ydistance/2));
-		else return (ydistance+(xdistance/2);
+		else return (ydistance+(xdistance/2));
 	}
 }
 
