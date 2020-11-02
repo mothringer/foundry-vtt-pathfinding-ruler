@@ -81,7 +81,7 @@ class PathfindingRuler
 						title: game.i18n.localize("pathfinding-ruler.toolname"),
 						layer: "TokenLayer",
 						icon: "fas fa-route",
-						visible: isGM
+						visible: game.user.isGM
 					};
 				}
 				else
