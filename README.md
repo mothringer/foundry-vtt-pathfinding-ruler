@@ -6,4 +6,4 @@ This module adds a new ruler option in the tokens tab. While it is active, a rul
 
 ## Installation
 
-Copy https://github.com/mothringer/foundry-vtt-pathfinding-ruler/archive/main.zip into the module installer manifest field.
+Copy https://raw.githubusercontent.com/mothringer/foundry-vtt-pathfinding-ruler/main/module.json into the module installer manifest field.
