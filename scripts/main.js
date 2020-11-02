@@ -119,7 +119,7 @@ class PathfindingRuler
 					this.origin = this.convertLocationToGridspace(token.center);
 					let origin = this.convertGridspaceToLocation(this.origin);
 					this.waypoints = [new PIXI.Point(origin.x,origin.y)];
-					if (!this.hitsWall(this.origin,this.endpoint))
+					if (!this.hitsWall(this.origin,this.endpoint,true))
 					{
 						this.drawRuler();
 					}
@@ -145,7 +145,7 @@ class PathfindingRuler
 		let newruler = this.ruler;
 		let endpoint = this.convertGridspaceToLocation(this.endpoint);
 		newruler._state = 2;
-		newruler.waypoints = this.waypoints;
+		newruler.waypoints = this.waypoints.splice(0);
 		newruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
 		newruler.class = "Ruler";
 		this.ruler.update(newruler);
@@ -199,9 +199,14 @@ class PathfindingRuler
 			ChatMessage.create(chatData, {chatBubble : true })
 	}
 	
-	hitsWall(A, B)
+	hitsWall(A, B, isGridspace)
 	{
-		let ray = new Ray(this.convertGridspaceToLocation(A),this.convertGridspaceToLocation(B));
+		if (isGridspace)
+		{
+			A = this.convertGridspaceToLocation(A);
+			B = this.convertGridspaceToLocation(B);
+		}
+		let ray = new Ray(A,B);
 		if (ray)
 			return WallsLayer.getRayCollisions(ray,{blockMovement:true, blockSenses:false, mode:"any"});
 		else return true;
@@ -248,21 +253,22 @@ class PathfindingRuler
 			}
 			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
-				let curr = currentNode;
+				this.removeRuler();
+				let current = currentNode;
 				let ret = [];
-				while(curr.parent)
+				while(current.parent)
 				{
-					let loc = [curr.x, curr.y];
+					let loc = [current.x, current.y];
 					loc = this.convertGridspaceToLocation(loc);
-					let point = new PIXI.Point(loc.x,loc.y);
-					ret.push(point);
-					curr = curr.parent;
+					ret.push(loc);
+					current = current.parent;
 				}
 				this.waypoints = [];
 				origin = this.convertGridspaceToLocation(this.origin);
-				this.waypoints.push(new PIXI.Point(origin.x,origin.y));
+				ret.push(origin);
+				this.pruneWaypoints(ret);
 				for (let i=ret.length-1;i>0;i--)
-					this.waypoints.push(ret[i]);
+					this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
 				this.drawRuler();
 				return;
 			}
@@ -273,7 +279,7 @@ class PathfindingRuler
 			for(let i=0;i<neighbors.length;i++)
 			{
 				let neighbor = neighbors[i];
-				if (this.isInList(closedList,neighbor) || this.hitsWall(currentNode,neighbor))
+				if (this.isInList(closedList,neighbor) || this.hitsWall(currentNode,neighbor,true))
 					continue;
 				
 				let gScore = 0;
@@ -340,6 +346,22 @@ class PathfindingRuler
 		let ydistance = Math.abs(start.y-end.y);
 		if (xdistance>ydistance) return (xdistance+(ydistance/2));
 		else return (ydistance+(xdistance/2));
+	}
+	
+	pruneWaypoints(waypointlist)
+	{
+		let i=0;
+		while(i<waypointlist.length-2)
+		{
+			if (!this.hitsWall(waypointlist[i],waypointlist[i+2],false))
+			{
+				waypointlist.splice(i+1,1);
+			}
+			else
+			{
+				i++;
+			}
+		}
 	}
 }
 
