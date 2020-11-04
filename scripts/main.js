@@ -118,9 +118,10 @@ class PathfindingRuler
 				{
 					this.origin = this.convertLocationToGridspace(token.center);
 					let origin = this.convertGridspaceToLocation(this.origin);
-					this.waypoints = [new PIXI.Point(origin.x,origin.y)];
 					if (!this.hitsWall(this.origin,this.endpoint,true))
 					{
+						this.waypoints = [new PIXI.Point(origin.x,origin.y)];
+						this.removeRuler();
 						this.drawRuler();
 					}
 					else
@@ -147,18 +148,24 @@ class PathfindingRuler
 		newruler._state = 2;
 		newruler.waypoints = this.waypoints.splice(0);
 		newruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
+		while ( newruler.waypoints.length > newruler.labels.children.length) 
+		{
+			newruler.labels.addChild(new PreciseText("", CONFIG.canvasTextStyle));
+		}
 		newruler.class = "Ruler";
 		this.ruler.update(newruler);
 	}
 	
 	removeRuler()
 	{
-		let newruler = this.ruler;
-		newruler._state = 0;
-		newruler.waypoints = [];
-		newruler.destination = [];
-		newruler.class = "Ruler";
-		this.ruler.update(newruler)
+		//let newruler = this.ruler;
+		//newruler._state = 0;
+		//newruler.waypoints = [];
+		//newruler.destination = [];
+		//newruler.class = "Ruler";
+		//this.ruler.update(newruler);
+		this.ruler.clear();
+		canvas.hud.token.clear();
 	}
 	
 	convertLocationToGridspace(location)
