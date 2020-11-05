@@ -44,16 +44,6 @@ class Config
 			config: true,
 			default: true,
 			type: Boolean,
-		});
-	
-		game.settings.register("pathfinding-ruler", "printMoveToChat",
-		{
-			name: game.i18n.localize("pathfinding-ruler.printMoveToChat.name"),
-			hint: game.i18n.localize("pathfinding-ruler.printMoveToChat.hint"),
-			scope: "world",
-			config: true,
-			default: true,
-			type: Boolean,
 		});*/
 	}
 }
@@ -68,6 +58,7 @@ class PathfindingRuler
 		this.ruler;
 		this.waypoints;
 		this.grid = [];
+		this.isActive;
 
 		Hooks.on("getSceneControlButtons", (buttons) => {
 			let tokenButton = buttons.find((button) => button.name === "token");
@@ -118,6 +109,7 @@ class PathfindingRuler
 				{
 					this.origin = this.convertLocationToGridspace(token.center);
 					let origin = this.convertGridspaceToLocation(this.origin);
+					this.isActive = true;
 					if (!this.hitsWall(this.origin,this.endpoint,true))
 					{
 						this.waypoints = [new PIXI.Point(origin.x,origin.y)];
@@ -131,14 +123,21 @@ class PathfindingRuler
 				}
 				else
 				{
-					this.removeRuler();
+					if (this.isActive)
+					{
+						this.removeRuler();
+						this.isActive = false;
+					}
 				}
 			}
 		}
 		else
 		{
-			if (game.activeTool !== "ruler")
+			if (this.isActive)
+			{
 				this.removeRuler();
+				this.isActive = false;
+			}
 		}
 	}
 	
@@ -154,20 +153,12 @@ class PathfindingRuler
 			newruler.labels.addChild(new PreciseText("", CONFIG.canvasTextStyle));
 		}
 		newruler.class = "Ruler";
-		this.ruler.update(newruler);
+		this.ruler.update(newruler.toJSON());
 	}
 	
 	removeRuler()
 	{
-		//let newruler = this.ruler;
-		//newruler._state = 0;
-		//newruler.waypoints = [];
-		//newruler.destination = [];
-		//newruler.class = "Ruler";
-		//this.ruler.update(newruler);
-		this.ruler._state = 0;
 		this.ruler.clear();
-		canvas.hud.token.clear();
 	}
 	
 	convertLocationToGridspace(location)

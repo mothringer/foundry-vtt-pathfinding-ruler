@@ -1,4 +1,8 @@
 #Patchnotes:
+## 0.7
+
+Improve handling of multiple users using ruler simultaneously.
+
 ## 0.6
 
 Fix breaking base ruler.
