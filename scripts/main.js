@@ -137,7 +137,8 @@ class PathfindingRuler
 		}
 		else
 		{
-			this.removeRuler();
+			if (game.activeTool !== "ruler")
+				this.removeRuler();
 		}
 	}
 	
@@ -164,6 +165,7 @@ class PathfindingRuler
 		//newruler.destination = [];
 		//newruler.class = "Ruler";
 		//this.ruler.update(newruler);
+		this.ruler._state = 0;
 		this.ruler.clear();
 		canvas.hud.token.clear();
 	}

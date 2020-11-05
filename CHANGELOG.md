@@ -1,4 +1,8 @@
 #Patchnotes:
+## 0.6
+
+Fix breaking base ruler.
+
 ## 0.5
 
 Fix label persistence bug.
