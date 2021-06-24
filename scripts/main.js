@@ -208,7 +208,7 @@ class PathfindingRuler
 		}
 		let ray = new Ray(A,B);
 		if (ray)
-			return WallsLayer.getRayCollisions(ray,{blockMovement:true, blockSenses:false, mode:"any"});
+			return canvas.walls.checkCollision(ray,{blockMovement:true, blockSenses:false, mode:"any"});
 		else return true;
 	}
 	
