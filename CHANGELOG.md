@@ -1,4 +1,8 @@
 #Patchnotes:
+## 0.8
+
+Compatibility with Foundry vtt 0.8 line.
+
 ## 0.7
 
 Improve handling of multiple users using ruler simultaneously.
