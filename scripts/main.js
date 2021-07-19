@@ -167,9 +167,9 @@ class PathfindingRuler
 	    // otherwise keep the waypoint; do nothing
 	  });
 	  this.ruler._state = Ruler.STATES.MEASURING; // does this accomplish anything now?
-	  this.ruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
+	  //this.ruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
 	  	  
-	  this.ruler.measure(destination);
+	  this.ruler.measure(new PIXI.Point(endpoint.x,endpoint.y));
 	}
 	
  /*
@@ -180,7 +180,7 @@ class PathfindingRuler
   * @return {Boolean} True if the points are within the error of each other 
   */
 	pointsAlmostEqual(p1, p2, EPSILON = 1e-5) {
-	  return this.almostEqual(p1.x, p2.x, EPSILON) && almostEqual(p1.y, p2.y, EPSILON);
+	  return this.almostEqual(p1.x, p2.x, EPSILON) && this.almostEqual(p1.y, p2.y, EPSILON);
 	}
 	
  /*
@@ -289,7 +289,7 @@ class PathfindingRuler
 			}
 			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
-				this.removeRuler(); // is this removal necessary?
+				//this.removeRuler(); // is this removal necessary?
 				let current = currentNode;
 				let ret = [];
 				while(current.parent)
@@ -342,7 +342,7 @@ class PathfindingRuler
 				}
 			}
 		}
-		this.removeRuler();
+		//this.removeRuler();
 	}
 	
 	isInList(list, node)
