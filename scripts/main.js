@@ -148,13 +148,15 @@ class PathfindingRuler
 	  // - allow other modules like Elevation Ruler to know when waypoints are added/removed
 	  const endpoint = this.convertGridspaceToLocation(this.endpoint);
 	  
-	  // for each waypoint from origin:
+	  console.log("Pathfinding|drawing", this.waypoints, this.ruler.waypoints);
+          // for each waypoint from origin:
 	  // if same point, keep
 	  // if new point, remove all subsequent waypoints
 	  this.waypoints.forEach((w, idx) => {
-	    if(this.ruler.waypoints.length < idx) {
+            console.log(`Pathfinding| idx ${idx}, w ${w.x}, ${w.y}`, w);
+	    if(this.ruler.waypoints.length <= idx) {
 	      this.ruler._addWaypoint(w);
-	    } else if(!pointsAlmostEqual(this.ruler.waypoints[idx], w)) {
+	    } else if(!this.pointsAlmostEqual(this.ruler.waypoints[idx], w)) {
 	      // remove all waypoints from idx on; then add the new waypoint
 	      const num_to_remove = this.ruler.waypoints.length - idx;
 	      for(let i=0; i < num_to_remove; i++) {
