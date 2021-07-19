@@ -113,7 +113,7 @@ class PathfindingRuler
 					if (!this.hitsWall(this.origin,this.endpoint,true))
 					{
 						this.waypoints = [new PIXI.Point(origin.x,origin.y)];
-						this.removeRuler();
+						//this.removeRuler(); duplicative with this.drawRuler now
 						this.drawRuler();
 					}
 					else
@@ -143,17 +143,16 @@ class PathfindingRuler
 	
 	drawRuler()
 	{
-		let newruler = this.ruler;
-		let endpoint = this.convertGridspaceToLocation(this.endpoint);
-		newruler._state = 2;
-		newruler.waypoints = this.waypoints.splice(0);
-		newruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
-		while ( newruler.waypoints.length > newruler.labels.children.length) 
-		{
-			newruler.labels.addChild(new PreciseText("", CONFIG.canvasTextStyle));
-		}
-		newruler.class = "Ruler";
-		this.ruler.update(newruler.toJSON());
+	  const endpoint = this.convertGridspaceToLocation(this.endpoint);
+	  
+	  this.removeRuler();
+	  this.waypoints.forEach(w => {
+	    this.ruler._addWaypoint(w);
+	  });
+	  this.ruler._state = Ruler.STATES.MEASURING; // does this accomplish anything now?
+	  this.ruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
+	  	  
+	  this.ruler.measure(destination);
 	}
 	
 	removeRuler()
