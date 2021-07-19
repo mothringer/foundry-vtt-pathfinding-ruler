@@ -143,17 +143,52 @@ class PathfindingRuler
 	
 	drawRuler()
 	{
+	  // avoid clearing the ruler unnecessarily:
+	  // - should help performance
+	  // - allow other modules like Elevation Ruler to know when waypoints are added/removed
 	  const endpoint = this.convertGridspaceToLocation(this.endpoint);
 	  
-	  this.removeRuler();
-	  this.waypoints.forEach(w => {
-	    this.ruler._addWaypoint(w);
+	  // for each waypoint from origin:
+	  // if same point, keep
+	  // if new point, remove all subsequent waypoints
+	  this.waypoints.forEach((w, idx) => {
+	    if(this.ruler.waypoints.length < idx) {
+	      this.ruler._addWaypoint(w);
+	    } else if(!pointsAlmostEqual(this.ruler.waypoints[idx], w)) {
+	      // remove all waypoints from idx on; then add the new waypoint
+	      const num_to_remove = this.ruler.waypoints.length - idx;
+	      for(let i=0; i < num_to_remove; i++) {
+	        this.ruler._removeWaypoint();
+	      }
+	      this.ruler._addWaypoint(w);  
+	    } 
+	    // otherwise keep the waypoint; do nothing
 	  });
 	  this.ruler._state = Ruler.STATES.MEASURING; // does this accomplish anything now?
 	  this.ruler.destination = new PIXI.Point(endpoint.x,endpoint.y);
 	  	  
 	  this.ruler.measure(destination);
 	}
+	
+ /*
+  * Test if two points are almost equal, given a small error window.
+  * Useful when comparing existing and proposed waypoints.
+  * @param {PIXI.Point} p1  Point in {x, y} format.
+  * @param {PIXI.Point} p2  Point in {x, y} format.
+  * @return {Boolean} True if the points are within the error of each other 
+  */
+	pointsAlmostEqual(p1, p2, EPSILON = 1e-5) {
+	  return this.almostEqual(p1.x, p2.x, EPSILON) && almostEqual(p1.y, p2.y, EPSILON);
+	}
+	
+ /*
+  * Test if two numbers are almost equal, given a small error window.
+  * From https://www.toptal.com/python/computational-geometry-in-python-from-theory-to-implementation
+  */
+  almostEqual(x, y, EPSILON = 1e-5) {
+    return Math.abs(x - y) < EPSILON;
+  }
+	
 	
 	removeRuler()
 	{
@@ -252,7 +287,7 @@ class PathfindingRuler
 			}
 			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
-				this.removeRuler();
+				this.removeRuler(); // is this removal necessary?
 				let current = currentNode;
 				let ret = [];
 				while(current.parent)
@@ -363,6 +398,8 @@ class PathfindingRuler
 		}
 	}
 }
+
+
 
 
 Hooks.on("init", () => {
