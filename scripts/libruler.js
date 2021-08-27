@@ -32,8 +32,10 @@ Hooks.once('libRulerReady', async function() {
  * @param {boolean} gridSpaces      Restrict measurement only to grid spaces
  */
 function pathfinderMeasure(wrapped, destination, options) {
-  if(game.activeTool === "pathfinding-ruler") {
+  const token_controls = ui.controls.controls.find(elem => elem.name === "token");
+  const pathfinding_control = token_controls.find(elem => elem.name === "pathfinding-ruler");
   
+  if(pathfinding_control.active) {
     // this part adapted from main.js mousemoveListener
     const previous_endpoint = this.getFlag(MODULE_ID, "endpoint");
     const newlocation = PathfindingRuler.convertLocationToGridspace(destination);
