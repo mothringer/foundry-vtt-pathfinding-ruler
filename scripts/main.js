@@ -239,7 +239,75 @@ setCanvasHooks() {
 		return grid;
 	}
 	
-  findPath(origin, endpoint)
+	static isInList(list, node)
+	{
+		for (let i=0; i<list.length; i++)
+		{
+			if (list[i].x === node.x && list[i].y === node.y)
+				return true;
+		}
+		return false;
+	}
+	
+	static isValidNode(node)
+	{
+		return (node.y >= 0 && node.y < (canvas.grid._height/canvas.grid.size) && node.x >= 0 && node.x < (canvas.grid._width/canvas.grid.size));
+	}
+	
+	static getNeighbors(node, grid)
+	{
+		let neighbors = [];
+		let x = node.x;
+		let y = node.y;
+		for (let i=-1; i<2; i++)
+		{
+			for (let j=-1;j<2;j++)
+			{
+				if (!(i===0 && j===0)&&PathfindingRuler.isValidNode({x:x+i,y:y+j}))
+					neighbors.push(grid[x+i][y+j]);
+			}
+		}
+		return neighbors;
+	}
+	
+	heuristic(start,end)
+	{
+		let xdistance = Math.abs(start.x-end.x);
+		let ydistance = Math.abs(start.y-end.y);
+		if (xdistance>ydistance) return (xdistance+(ydistance/2));
+		else return (ydistance+(xdistance/2));
+	}
+	
+	static pruneWaypoints(waypointlist)
+	{
+		let i=0;
+		while(i<waypointlist.length-2)
+		{
+			if (!PathfindingRuler.hitsWall(waypointlist[i],waypointlist[i+2],false))
+			{
+				waypointlist.splice(i+1,1);
+			}
+			else
+			{
+				i++;
+			}
+		}
+	}
+}
+
+
+Hooks.on("init", () => {
+	if(!game.modules.get('libruler')?.active) {
+		const pathfindingRuler = new PathfindingRuler();
+	} else {
+		 // we need to instantiate the config settings b/c we are not creating the full Pathfinder Class from main.js
+		new Config();
+		PathfindingRuler.setSceneControlHooks();
+	}
+});
+
+
+export function findPath(origin, endpoint)
 	{
 		const grid = PathfindingRuler.rebuildGrid();
 		endpoint = {x:endpoint[0],y:endpoint[1]};
@@ -317,76 +385,6 @@ setCanvasHooks() {
 		}
 		if(!game.modules.get('libruler')?.active) this.removeRuler();
 	}
-	
-	static isInList(list, node)
-	{
-		for (let i=0; i<list.length; i++)
-		{
-			if (list[i].x === node.x && list[i].y === node.y)
-				return true;
-		}
-		return false;
-	}
-	
-	static isValidNode(node)
-	{
-		return (node.y >= 0 && node.y < (canvas.grid._height/canvas.grid.size) && node.x >= 0 && node.x < (canvas.grid._width/canvas.grid.size));
-	}
-	
-	static getNeighbors(node, grid)
-	{
-		let neighbors = [];
-		let x = node.x;
-		let y = node.y;
-		for (let i=-1; i<2; i++)
-		{
-			for (let j=-1;j<2;j++)
-			{
-				if (!(i===0 && j===0)&&PathfindingRuler.isValidNode({x:x+i,y:y+j}))
-					neighbors.push(grid[x+i][y+j]);
-			}
-		}
-		return neighbors;
-	}
-	
-	heuristic(start,end)
-	{
-		let xdistance = Math.abs(start.x-end.x);
-		let ydistance = Math.abs(start.y-end.y);
-		if (xdistance>ydistance) return (xdistance+(ydistance/2));
-		else return (ydistance+(xdistance/2));
-	}
-	
-	static pruneWaypoints(waypointlist)
-	{
-		let i=0;
-		while(i<waypointlist.length-2)
-		{
-			if (!PathfindingRuler.hitsWall(waypointlist[i],waypointlist[i+2],false))
-			{
-				waypointlist.splice(i+1,1);
-			}
-			else
-			{
-				i++;
-			}
-		}
-	}
-}
-
-
-Hooks.on("init", () => {
-	if(!game.modules.get('libruler')?.active) {
-		const pathfindingRuler = new PathfindingRuler();
-	} else {
-		 // we need to instantiate the config settings b/c we are not creating the full Pathfinder Class from main.js
-		new Config();
-		PathfindingRuler.setSceneControlHooks();
-	}
-});
-
-
-
 	
 Object.defineProperty(PathfindingRuler.prototype, "findPath", {
 	value: findPath,
