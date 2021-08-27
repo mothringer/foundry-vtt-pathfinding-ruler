@@ -14,6 +14,30 @@
  */
 "use strict"
 
+import { pathfinderMeasure } from "./libruler.js";
+
+const MODULE_ID = "pathfinding-ruler";
+
+function log(...args) {
+  try {
+      console.log(MODULE_ID, '|', ...args);
+  } catch (e) {}
+}
+
+
+Hooks.once('libRulerReady', async function() {
+  log(`libRuler is ready; adding findPath`);
+  Object.defineProperty(Ruler.prototype, "findPath", {
+    value: findPath,
+    writable: true,
+    configurable: true
+  });
+  
+  log(`registering Ruler.measure`);
+  libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
+  log(`done registration!`);
+});
+
 class Config
 {
 	constructor()
@@ -115,6 +139,7 @@ setCanvasHooks() {
 			let newlocation = PathfindingRuler.convertLocationToGridspace(event.data.getLocalPosition(canvas.grid));
 			if (this.endpoint[0] !== newlocation[0] || this.endpoint[1] !== newlocation[1])
 			{
+//log(`mousemove newlocation ${newlocation[0]}, ${newlocation[1]}`, this);
 				this.endpoint = newlocation;
 				let token = canvas.tokens.controlled[0];
 				if (token)
@@ -130,7 +155,7 @@ setCanvasHooks() {
 					}
 					else
 					{
-						this.findPath();
+						this.findPath(this.origin, this.endpoint);
 					}
 				}
 				else
@@ -276,7 +301,7 @@ setCanvasHooks() {
 		return neighbors;
 	}
 	
-	heuristic(start,end)
+	static heuristic(start,end)
 	{
 		let xdistance = Math.abs(start.x-end.x);
 		let ydistance = Math.abs(start.y-end.y);
@@ -315,6 +340,8 @@ Hooks.on("init", () => {
 
 export function findPath(origin, endpoint)
 	{
+                log(`findPath origin ${origin[0]}, ${origin[1]}; destination ${endpoint[0]}, ${endpoint[1]}`, this);
+
 		const grid = PathfindingRuler.rebuildGrid();
 		endpoint = {x:endpoint[0],y:endpoint[1]};
 		let openList = [];
@@ -336,7 +363,7 @@ export function findPath(origin, endpoint)
 			}
 			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
-				if(!game.modules.get('libruler')?.active) removeRuler();
+				if(!game.modules.get('libruler')?.active) this.removeRuler();
 				let current = currentNode;
 				let ret = [];
 				while(current.parent)
@@ -374,7 +401,7 @@ export function findPath(origin, endpoint)
 				if (!PathfindingRuler.isInList(openList,neighbor))
 				{
 					gScoreIsBest = true;
-					neighbor.h = this.heuristic(neighbor,endpoint)
+					neighbor.h = PathfindingRuler.heuristic(neighbor,endpoint)
 					openList.push(neighbor);
 				}
 				else if (gScore < neighbor.g)

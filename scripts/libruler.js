@@ -12,17 +12,26 @@ import { PathfindingRuler, findPath } from "./main.js";
 
 const MODULE_ID = "pathfinding-ruler"
 
+function log(...args) {
+  try {
+      console.log(MODULE_ID, '|', ...args);
+  } catch (e) {}
+}
 
-
+/*
 Hooks.once('libRulerReady', async function() {
+  log(`libRuler is ready; adding findPath`);
   Object.defineProperty(Ruler.prototype, "findPath", {
     value: findPath,
     writable: true,
     configurable: true
   });
   
+  log(`registering Ruler.measure`);
   libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
-}
+  log(`done registration!`);
+};
+*/
 
 // wrap measure -- whenever measure is called, update the waypoints
 // easier than tracking onMouseMove and should result in less unnecessary processing
@@ -31,11 +40,12 @@ Hooks.once('libRulerReady', async function() {
  * @param {PIXI.Point} destination  The destination point to which to measure
  * @param {boolean} gridSpaces      Restrict measurement only to grid spaces
  */
-function pathfinderMeasure(wrapped, destination, options) {
+export function pathfinderMeasure(wrapped, destination, options) {
   const token_controls = ui.controls.controls.find(elem => elem.name === "token");
-  const pathfinding_control = token_controls.find(elem => elem.name === "pathfinding-ruler");
+  const pathfinding_control = token_controls.tools.find(elem => elem.name === "pathfinding-ruler");
   
-  if(pathfinding_control.active) {
+  if(pathfinding_control?.active) {
+    log(`measure: pathfinding control is active. Using `);
     // this part adapted from main.js mousemoveListener
     const previous_endpoint = this.getFlag(MODULE_ID, "endpoint");
     const newlocation = PathfindingRuler.convertLocationToGridspace(destination);
@@ -43,7 +53,7 @@ function pathfinderMeasure(wrapped, destination, options) {
       // we have moved destination to another gridspace. 
       this.setFlag(MODULE_ID, "endpoint", newlocation);
     
-      const origin_grid = PathfindingRuler.convertLocationToGridSpace(this.origin);
+      const origin_grid = PathfindingRuler.convertLocationToGridspace(this.waypoints[0]);
       if(PathfindingRuler.hitsWall(origin_grid, newlocation, true)) {
         this.findPath(origin_grid, newlocation);
       }
