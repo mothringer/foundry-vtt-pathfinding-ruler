@@ -100,7 +100,7 @@ setCanvasHooks() {
 			this.ruler = canvas.controls._rulers[game.user._id];
 		});
 	}
-}
+
 	
 	mousemoveListener(event)
 	{
