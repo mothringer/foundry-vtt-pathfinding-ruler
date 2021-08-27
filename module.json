@@ -13,7 +13,7 @@
       "path": "lang/en.json"
     }
   ],
-  "scripts": ["./scripts/main.js"],
+  "esmodules": ["./scripts/main.js"],
   "version": "0.7",
   "minimumCoreVersion": "0.8.7",
   "compatibleCoreVersion": "0.8.7"
