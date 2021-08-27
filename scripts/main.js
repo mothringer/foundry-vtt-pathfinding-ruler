@@ -48,7 +48,7 @@ class Config
 	}
 }
 
-class PathfindingRuler
+export class PathfindingRuler
 {
 	constructor()
 	{
