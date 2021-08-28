@@ -14,7 +14,7 @@
  */
 "use strict"
 
-import { pathfinderMeasure } from "./libruler.js";
+import { pathfinderMeasure, pathfinderAddWaypoint, pathfinderClear } from "./libruler.js";
 
 const MODULE_ID = "pathfinding-ruler";
 
@@ -35,6 +35,9 @@ Hooks.once('libRulerReady', async function() {
   
   log(`registering Ruler.measure`);
   libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
+  libWrapper.register(MODULE_ID, 'Ruler.prototype._addWaypoint', pathfinderAddWaypoint, 'WRAPPER');
+  libWrapper.register(MODULE_ID, 'Ruler.prototype.clear', pathfinderClear, 'WRAPPER');
+  
   log(`done registration!`);
 });
 
@@ -376,11 +379,11 @@ export function findPath(origin, endpoint)
 				
 				if(!use_libruler) this.waypoints = []; // will clear the waypoints in Ruler.measure wrap (see libruler.js)
 				const origin_loc = PathfindingRuler.convertGridspaceToLocation(origin);
-				ret.push(origin_loc);
+				if(!use_libruler) ret.push(origin_loc);
 				PathfindingRuler.pruneWaypoints(ret);
 				for (let i=ret.length-1;i>0;i--) {
 				  if(use_libruler) {
-				    this.addWaypoint(ret[i]);
+				    this._addWaypoint(ret[i]);
 				  } else {
 				    this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
 				  }
