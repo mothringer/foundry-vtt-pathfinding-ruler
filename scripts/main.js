@@ -16,29 +16,19 @@
 
 import { pathfinderMeasure, pathfinderAddWaypoint, pathfinderClear } from "./libruler.js";
 
-const MODULE_ID = "pathfinding-ruler";
-
-function log(...args) {
-  try {
-      console.log(MODULE_ID, '|', ...args);
-  } catch (e) {}
-}
+export const MODULE_ID = "pathfinding-ruler";
 
 
 Hooks.once('libRulerReady', async function() {
-  log(`libRuler is ready; adding findPath`);
   Object.defineProperty(Ruler.prototype, "findPath", {
     value: findPath,
     writable: true,
     configurable: true
   });
   
-  log(`registering Ruler.measure`);
   libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
   libWrapper.register(MODULE_ID, 'Ruler.prototype._addWaypoint', pathfinderAddWaypoint, 'WRAPPER');
-  libWrapper.register(MODULE_ID, 'Ruler.prototype.clear', pathfinderClear, 'WRAPPER');
-  
-  log(`done registration!`);
+  libWrapper.register(MODULE_ID, 'Ruler.prototype.clear', pathfinderClear, 'WRAPPER');  
 });
 
 class Config
@@ -142,7 +132,6 @@ setCanvasHooks() {
 			let newlocation = PathfindingRuler.convertLocationToGridspace(event.data.getLocalPosition(canvas.grid));
 			if (this.endpoint[0] !== newlocation[0] || this.endpoint[1] !== newlocation[1])
 			{
-//log(`mousemove newlocation ${newlocation[0]}, ${newlocation[1]}`, this);
 				this.endpoint = newlocation;
 				let token = canvas.tokens.controlled[0];
 				if (token)
@@ -343,7 +332,6 @@ Hooks.on("init", () => {
 
 export function findPath(origin, endpoint)
 	{
-                log(`findPath origin ${origin[0]}, ${origin[1]}; destination ${endpoint[0]}, ${endpoint[1]}`, this);
     const use_libruler = game.modules.get('libruler')?.active;
 		const grid = PathfindingRuler.rebuildGrid();
 		endpoint = {x:endpoint[0],y:endpoint[1]};
