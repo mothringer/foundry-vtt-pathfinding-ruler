@@ -341,7 +341,7 @@ Hooks.on("init", () => {
 export function findPath(origin, endpoint)
 	{
                 log(`findPath origin ${origin[0]}, ${origin[1]}; destination ${endpoint[0]}, ${endpoint[1]}`, this);
-
+    const use_libruler = game.modules.get('libruler')?.active;
 		const grid = PathfindingRuler.rebuildGrid();
 		endpoint = {x:endpoint[0],y:endpoint[1]};
 		let openList = [];
@@ -358,12 +358,12 @@ export function findPath(origin, endpoint)
 			let currentNode = openList[lowIndex];
 			if (currentNode.f > game.settings.get("pathfinding-ruler", "MaxDistance"))
 			{
-				if(!game.modules.get('libruler')?.active) this.removeRuler();
+				if(!use_libruler) this.removeRuler();
 				return;
 			}
 			if (currentNode.x=== endpoint.x && currentNode.y === endpoint.y)
 			{
-				if(!game.modules.get('libruler')?.active) this.removeRuler();
+				if(!use_libruler) this.removeRuler();
 				let current = currentNode;
 				let ret = [];
 				while(current.parent)
@@ -373,13 +373,19 @@ export function findPath(origin, endpoint)
 					ret.push(loc);
 					current = current.parent;
 				}
-				this.waypoints = [];
+				
+				if(!use_libruler) this.waypoints = []; // will clear the waypoints in Ruler.measure wrap (see libruler.js)
 				const origin_loc = PathfindingRuler.convertGridspaceToLocation(origin);
 				ret.push(origin_loc);
 				PathfindingRuler.pruneWaypoints(ret);
-				for (let i=ret.length-1;i>0;i--)
-					this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
-				if(!game.modules.get('libruler')?.active) this.drawRuler();
+				for (let i=ret.length-1;i>0;i--) {
+				  if(use_libruler) {
+				    this.addWaypoint(ret[i]);
+				  } else {
+				    this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
+				  }
+				}
+				if(!use_libruler) this.drawRuler();
 				return;
 			}
 			openList.splice(lowIndex,1);
@@ -416,7 +422,7 @@ export function findPath(origin, endpoint)
 				}
 			}
 		}
-		if(!game.modules.get('libruler')?.active) this.removeRuler();
+		if(!use_libruler) this.removeRuler();
 	}
 	
 Object.defineProperty(PathfindingRuler.prototype, "findPath", {

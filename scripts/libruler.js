@@ -45,17 +45,30 @@ export function pathfinderMeasure(wrapped, destination, options) {
   const pathfinding_control = token_controls.tools.find(elem => elem.name === "pathfinding-ruler");
   
   if(pathfinding_control?.active) {
-    log(`measure: pathfinding control is active. Using `);
+    log(`measure: pathfinding control is active.`);    
     // this part adapted from main.js mousemoveListener
     const previous_endpoint = this.getFlag(MODULE_ID, "endpoint");
     const newlocation = PathfindingRuler.convertLocationToGridspace(destination);
     if(!previous_endpoint || previous_endpoint[0] !== newlocation[0] || previous_endpoint[1] !== newlocation[1]) {
       // we have moved destination to another gridspace. 
       this.setFlag(MODULE_ID, "endpoint", newlocation);
+      
+      // origin for pathfinding is the last user-set waypoint, 
+      //   otherwise the origin waypoint
+      const user_waypoint_indices = this.getFlag(MODULE_ID, "user_waypoint_indices") || [];
+      const last_user_waypoint = user_waypoint_indices.reduce((a, b) => Math.max(a,b), Number.NEGATIVE_INFINITY);
+      log(`Last user waypoint index is ${last_user_waypoint}`, this.waypoints, user_waypoint_indices);
+      const origin = this.waypoints[last_user_waypoint];
     
-      const origin_grid = PathfindingRuler.convertLocationToGridspace(this.waypoints[0]);
+      const origin_grid = PathfindingRuler.convertLocationToGridspace(origin);
       if(PathfindingRuler.hitsWall(origin_grid, newlocation, true)) {
+        // clear back to the last user waypoint
+        for(let i = (this.waypoints.length - 1); i > last_user_waypoint; i--) {
+          this._removeWaypoint(destination, {remeasure = false});
+        }
+        this.setFlag(MODULE_ID, "pathfinding_active", true); // so addWaypoint can distinguish between user-added waypoints and pathfinding waypoints
         this.findPath(origin_grid, newlocation);
+        this.setFlag(MODULE_ID, "pathfinding_active", false);
       }
     } 
   }
@@ -63,4 +76,40 @@ export function pathfinderMeasure(wrapped, destination, options) {
   wrapped(destination, options);
 }
 
+/*
+ * Wrap _addWaypoint to track when the user adds a waypoint
+ */
+export function pathfinderAddWaypoint(wrapped, ...args) {
+  // just capture the new waypoint number after it is added
+  wrapped(...args)
+  
+  const pathfinding_active = this.getFlag(MODULE_ID, "pathfinding_active");
+  if(!pathfinding_active) {
+    const user_waypoint_indices = this.getFlag(MODULE_ID, "user_waypoint_indices") || [];
+    user_waypoint_indices.push(this.waypoints.length - 1); // last one is the newly added
+    this.setFlag(MODULE_ID, "user_waypoint_indices", user_waypoint_indices);
+  }
+}
+
+/*
+ * Wrap _removeWaypoint to track when the user removes a waypoint
+ */
+export function pathfinderRemoveWaypoint(wrapped, ...args) {
+  let user_waypoint_indices = this.getFlag(MODULE_ID, "user_waypoint_indices") || [];
+  user_waypoint_indices = user_waypoint_indices.filter(elem => elem < (this.waypoints.length - 2); // -2 b/c we will be removing the last waypoint below
+  this.setFlag(MODULE_ID, "user_waypoint_indices", user_waypoint_indices);
+  
+  wrapped(...args);
+}
+
+/*
+ * Wrap clear to remove tracking of user waypoints
+ */
+export function pathfinderClear(wrapped) {
+  this.unsetFlag(MODULE_ID, "user_waypoint_indices");
+  this.unsetFlag(MODULE_ID, "pathfinding_active");
+
+  wrapped();
+}
+ 
 
