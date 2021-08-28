@@ -69,7 +69,7 @@ export function pathfinderAddWaypoint(wrapped, ...args) {
  */
 export function pathfinderClear(wrapped) {
   this.unsetFlag(MODULE_ID, "pathfinding_active");
-
+  this.unsetFlag(MODULE_ID, "endpoint");
   wrapped();
 }
  
