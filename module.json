@@ -8,7 +8,7 @@
 	"readme": "https://github.com/caewok/foundry-vtt-pathfinding-ruler/blob/master/README.md",
 	"changelog": "https://github.com/caewok/foundry-vtt-pathfinding-ruler/blob/master/CHANGELOG.md",
 	"bugs": "https://github.com/caewok/foundry-vtt-pathfinding-ruler/issues",
-	"allowBugReporter": true
+	"allowBugReporter": true,
   "authors": [
   	{
 			"name": "Mothringer",
