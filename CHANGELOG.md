@@ -1,4 +1,8 @@
 #Patchnotes:
+
+# 0.8 (libRuler version)
+Soft dependency on libRuler and libWrapper. Compatibility with Foundry 0.9 when both are installed.
+
 ## 0.8
 
 Compatibility with Foundry vtt 0.8 line.
