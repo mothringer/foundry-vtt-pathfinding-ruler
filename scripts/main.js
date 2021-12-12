@@ -70,6 +70,19 @@ class Config
 			default: 40,
 			type: Number,
 		});
+		
+		if(game.modules.get('libruler')?.active) {
+			game.settings.register("pathfinding-ruler", "toolcontrolEnabled",
+			{
+				name: game.i18n.localize("pathfinding-ruler.toolcontrolEnabled.name"),
+				hint: game.i18n.localize("pathfinding-ruler.toolcontrolEnabled.hint"),
+				scope: "client",
+				config: true,
+				default: true,
+				type: Boolean,
+			});		
+		}
+		
 		/*game.settings.register("pathfinding-ruler", "pathfinderDiagonals",
 		{
 			name: game.i18n.localize("pathfinding-ruler.pathfinderDiagonals.name"),
@@ -125,10 +138,9 @@ static setSceneControlHooks() {
 				}
 				
 				if(game.modules.get('libruler')?.active) {
-				  tool.toggle = true;
-				  tool.active = false; // start inactive after loading game
+					tool.toggle = true;
+					tool.active = game.settings.get("pathfinding-ruler", "toolcontrolEnabled");
 				}
-				
 				tokenButton.tools.push(tool);
 			}
 		});
