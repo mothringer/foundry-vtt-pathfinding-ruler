@@ -5,5 +5,8 @@
 	"pathfinding-ruler.GMOnly.hint":"If checked, players will not have access to use the tool",
 	"pathfinding-ruler.toolname":"Pathfinding Ruler",
 	"pathfinding-ruler.MaxDistance.name":"Max measuring distance",
-	"pathfinding-ruler.MaxDistance.hint":"The maximum distance of measurement to try before giving up, in grid squares."
+	"pathfinding-ruler.MaxDistance.hint":"The maximum distance of measurement to try before giving up, in grid squares.",
+	
+	"pathfinding-ruler.toolcontrolEnabled.name":"Pathfinding button default on",
+	"pathfinding-ruler.toolcontrolEnabled.hint":"If checked, the Pathfinding control button will be enabled unless you turn it off."
 }

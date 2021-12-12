@@ -1,4 +1,11 @@
 #Patchnotes:
+
+# 0.8 (libRuler version 2)
+Hard dependency on libRuler and libWrapper so compatibility with Foundry 0.9 is assured. Added user setting to start the Pathfinding control button in an enabled state.
+
+# 0.8 (libRuler version)
+Soft dependency on libRuler and libWrapper. Compatibility with Foundry 0.9 when both are installed.
+
 ## 0.8
 
 Compatibility with Foundry vtt 0.8 line.
