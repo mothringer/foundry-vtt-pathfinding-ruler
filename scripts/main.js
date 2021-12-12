@@ -1,3 +1,20 @@
+/* globals
+Hooks,
+Ruler,
+libWrapper,
+game,
+canvas,
+PIXI,
+CONFIG,
+PreciseText,
+ChatMessage,
+CONST,
+Ray
+*/
+
+'use strict';
+
+
 /*
  *	This program is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -6,11 +23,11 @@
  *
  *	This program is distributed in the hope that it will be useful,
  *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  *	GNU General Public License for more details.
  *
  *	You should have received a copy of the GNU General Public License
- *	along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *	along with this program.	If not, see <https://www.gnu.org/licenses/>.
  */
 "use strict"
 
@@ -20,15 +37,15 @@ export const MODULE_ID = "pathfinding-ruler";
 
 
 Hooks.once('libRulerReady', async function() {
-  Object.defineProperty(Ruler.prototype, "findPath", {
-    value: findPath,
-    writable: true,
-    configurable: true
-  });
-  
-  libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
-  libWrapper.register(MODULE_ID, 'Ruler.prototype._addWaypoint', pathfinderAddWaypoint, 'WRAPPER');
-  libWrapper.register(MODULE_ID, 'Ruler.prototype.clear', pathfinderClear, 'WRAPPER');  
+	Object.defineProperty(Ruler.prototype, "findPath", {
+		value: findPath,
+		writable: true,
+		configurable: true
+	});
+	
+	libWrapper.register(MODULE_ID, 'Ruler.prototype.measure', pathfinderMeasure, 'WRAPPER');
+	libWrapper.register(MODULE_ID, 'Ruler.prototype._addWaypoint', pathfinderAddWaypoint, 'WRAPPER');
+	libWrapper.register(MODULE_ID, 'Ruler.prototype.clear', pathfinderClear, 'WRAPPER');	
 });
 
 class Config
@@ -321,9 +338,9 @@ setCanvasHooks() {
 
 Hooks.on("init", () => {
 	if(!game.modules.get('libruler')?.active) {
-		const pathfindingRuler = new PathfindingRuler();
+		new PathfindingRuler();
 	} else {
-		 // we need to instantiate the config settings b/c we are not creating the full Pathfinder Class from main.js
+		// we need to instantiate the config settings b/c we are not creating the full Pathfinder Class from main.js
 		new Config();
 		PathfindingRuler.setSceneControlHooks();
 	}
@@ -332,7 +349,7 @@ Hooks.on("init", () => {
 
 export function findPath(origin, endpoint)
 	{
-    const use_libruler = game.modules.get('libruler')?.active;
+		const use_libruler = game.modules.get('libruler')?.active;
 		const grid = PathfindingRuler.rebuildGrid();
 		endpoint = {x:endpoint[0],y:endpoint[1]};
 		let openList = [];
@@ -370,11 +387,11 @@ export function findPath(origin, endpoint)
 				if(!use_libruler) ret.push(origin_loc);
 				PathfindingRuler.pruneWaypoints(ret);
 				for (let i=ret.length-1;i>0;i--) {
-				  if(use_libruler) {
-				    this._addWaypoint(ret[i]);
-				  } else {
-				    this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
-				  }
+					if(use_libruler) {
+						this._addWaypoint(ret[i]);
+					} else {
+						this.waypoints.push(new PIXI.Point(ret[i].x,ret[i].y));
+					}
 				}
 				if(!use_libruler) this.drawRuler();
 				return;

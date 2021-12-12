@@ -1,3 +1,8 @@
+/* globals
+ui
+*/
+'use strict';
+
 /*
 For using Pathfinding Ruler with libRuler
 Whenever the pathfinding tool icon is enabled, any ruler based on libRuler will use
@@ -8,7 +13,7 @@ See https://github.com/caewok/foundryvtt-drag-ruler/tree/caewok-libruler for an 
 See https://github.com/caewok/fvtt-speed-ruler for an example of how two modules might interact
 */
 
-import { PathfindingRuler, findPath, MODULE_ID } from "./main.js";
+import { PathfindingRuler, MODULE_ID } from "./main.js";
 
 /**
  * Measure the distance between two points and render the ruler UI to illustrate it.
