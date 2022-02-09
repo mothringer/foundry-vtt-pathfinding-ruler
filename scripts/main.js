@@ -91,7 +91,7 @@ class PathfindingRuler
 
 		Hooks.on("canvasReady", () => {
 			canvas.stage.on("mousemove", (event) => this.mousemoveListener(event));
-			this.ruler = canvas.controls._rulers[game.user._id];
+			this.ruler = canvas.controls._rulers[game.user.id];
 		});
 	}
 	
